@@ -1,5 +1,5 @@
 {
-  "name": "@punpun-on-npm/tinyresult",
+  "name": "resultat-ts",
   "version": "0.1.0",
   "description": "A tiny TypeScript Result type for explicit error handling without exceptions",
   "type": "module",
@@ -21,7 +21,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/martin-dinahet/tinyresult"
+    "url": "https://github.com/martin-dinahet/resultat-ts"
   },
   "packageManager": "pnpm@10.33.0",
   "scripts": {
