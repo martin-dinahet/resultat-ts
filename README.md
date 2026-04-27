@@ -1,23 +1,23 @@
-# tinyresult
+# @punpun/tinyresult
 
 A tiny TypeScript Result type for explicit error handling without exceptions. Inspired by Rust's `Result` type.
 
-[![npm version](https://badge.fury.io/js/tinyresult.svg)](https://www.npmjs.com/package/tinyresult)
+[![npm version](https://badge.fury.io/js/@punpun%2Ftinyresult.svg)](https://www.npmjs.com/package/@punpun/tinyresult)
 
 ## Installation
 
 ```bash
-npm install tinyresult
+npm install @punpun/tinyresult
 # or
-pnpm add tinyresult
+pnpm add @punpun/tinyresult
 # or
-yarn add tinyresult
+yarn add @punpun/tinyresult
 ```
 
 ## Usage
 
 ```typescript
-import { ok, fail, isOk, unwrap, map, match } from "tinyresult";
+import { ok, fail, isOk, unwrap, map, match } from "@punpun/tinyresult";
 
 // Create results
 const success = ok(42);
