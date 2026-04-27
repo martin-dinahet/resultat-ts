@@ -1,5 +1,5 @@
 {
-  "name": "@punpun/tinyresult",
+  "name": "@punpun-on-npm/tinyresult",
   "version": "0.1.0",
   "description": "A tiny TypeScript Result type for explicit error handling without exceptions",
   "type": "module",
