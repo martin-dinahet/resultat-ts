@@ -21,7 +21,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/anomalyco/tinyresult"
+    "url": "https://github.com/martin-dinahet/tinyresult"
   },
   "packageManager": "pnpm@10.33.0",
   "scripts": {
