@@ -9,6 +9,7 @@ import type { Success } from "./success.js";
  * Commonly used in functional-style pipelines and async flows.
  *
  * @template T - The type of the success value.
+ * @template E - The type of the error (defaults to `string`).
  *
  * @example
  * const result: Result<number> = ok(42);
@@ -18,4 +19,4 @@ import type { Success } from "./success.js";
  *   console.error(result.error);
  * }
  */
-export type Result<T> = Success<T> | Failure;
+export type Result<T, E = string> = Success<T> | Failure<E>;

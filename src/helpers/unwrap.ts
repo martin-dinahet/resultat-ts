@@ -9,9 +9,10 @@ import type { Success } from "../types/success.js";
  * like {@link unwrapOr} or {@link unwrapOrElse} when possible.
  *
  * @template T - The value type.
+ * @template E - The error type.
  * @param result - The result to unwrap.
  * @returns The contained value if successful.
- * @throws {Error} If the result is a failure.
+ * @throws If the result is a failure, throws the error value if it's an Error, otherwise wraps it in an Error.
  *
  * @example
  * const value = unwrap(ok(42)); // 42
@@ -19,7 +20,7 @@ import type { Success } from "../types/success.js";
  * @example
  * unwrap(fail("boom")); // throws Error("boom")
  */
-export function unwrap<T>(result: Result<T>): T {
+export function unwrap<T, E>(result: Result<T, E>): T {
   if (result.success) return result.value;
-  throw new Error(result.error);
+  throw result.error instanceof Error ? result.error : new Error(String(result.error));
 }

@@ -1,31 +1,22 @@
-name: Publish to npm
+name: Tests
 
 on:
-  release:
-    types: [published]
+  push:
+  pull_request:
 
 jobs:
-  publish:
+  test:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      id-token: write
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
-          registry-url: "https://registry.npmjs.org"
 
       - uses: pnpm/action-setup@v4
         with:
           packageManager: pnpm@10.33.0
 
       - run: pnpm install
-      - run: pnpm build
       - run: pnpm test
-
-      - run: pnpm publish
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

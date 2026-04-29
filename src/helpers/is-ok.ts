@@ -8,6 +8,7 @@ import type { Success } from "../types/success.js";
  * inside the `if`, `result` is inferred as `Success<T>`.
  *
  * @template T - The value type.
+ * @template E - The error type.
  * @param result - The result to check.
  * @returns `true` if the result is a success.
  *
@@ -16,6 +17,6 @@ import type { Success } from "../types/success.js";
  *   result.value; // typed as T
  * }
  */
-export function isOk<T>(result: Result<T>): result is Success<T> {
+export function isOk<T, E>(result: Result<T, E>): result is Success<T> {
   return result.success;
 }
