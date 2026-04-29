@@ -1,23 +1,23 @@
-# resultat-ts
+# ts-result
 
 A tiny TypeScript Result type for explicit error handling without exceptions. Inspired by Rust's `Result` type.
 
-[![npm version](https://badge.fury.io/js/resultat-ts.svg)](https://www.npmjs.com/package/resultat-ts)
+[![npm version](https://badge.fury.io/js/@punpun-dev%2fts-result.svg)](https://www.npmjs.com/package/@punpun-dev/ts-result)
 
 ## Installation
 
 ```bash
-npm install resultat-ts
+npm install @punpun-dev/ts-result
 # or
-pnpm add resultat-ts
+pnpm add @punpun-dev/ts-result
 # or
-yarn add resultat-ts
+yarn add @punpun-dev/ts-result
 ```
 
 ## Usage
 
 ```typescript
-import { ok, fail, isOk, unwrap, map, match } from "resultat-ts";
+import { ok, fail, isOk, unwrap, map, match } from "@punpun-dev/ts-result";
 
 // Create results
 const success = ok(42);
@@ -100,7 +100,7 @@ type Result<T, E = string> = Success<T> | Failure<E>;
 By default, errors are `string`. You can use custom error types for richer error handling:
 
 ```typescript
-import { ok, fail, tryCatch, match, mapError } from "resultat-ts";
+import { ok, fail, tryCatch, match, mapError } from "@punpun-dev/ts-result";
 
 // Custom error type
 class ValidationError {
