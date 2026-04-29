@@ -47,36 +47,36 @@ const fallback = unwrapOr(fail("err"), 0); // 0
 ### Constructors
 
 - **`ok<T>(value: T): Success<T>`** - Creates a success result
-- **`fail(error: string): Failure`** - Creates a failure result
+- **`fail<E = string>(error: E): Failure<E>`** - Creates a failure result (error can be any type)
 
 ### Type Guards
 
-- **`isOk<T>(result: Result<T>): result is Success<T>`** - Checks if result is success
-- **`isFail<T>(result: Result<T>): result is Failure`** - Checks if result is failure
+- **`isOk<T, E>(result: Result<T, E>): result is Success<T>`** - Checks if result is success
+- **`isFail<T, E>(result: Result<T, E>): result is Failure<E>`** - Checks if result is failure
 
 ### Unwrap
 
-- **`unwrap<T>(result: Result<T>): T`** - Extracts value or throws
-- **`unwrapOr<T>(result: Result<T>, fallback: T): T`** - Extracts value or returns fallback
-- **`unwrapOrElse<T>(result: Result<T>, fn: (error: string) => T): T`** - Extracts value or computes fallback
+- **`unwrap<T, E>(result: Result<T, E>): T`** - Extracts value or throws (preserves original error)
+- **`unwrapOr<T, E>(result: Result<T, E>, fallback: T): T`** - Extracts value or returns fallback
+- **`unwrapOrElse<T, E>(result: Result<T, E>, fn: (error: E) => T): T`** - Extracts value or computes fallback
 
 ### Transform
 
-- **`map<T, U>(result: Result<T>, fn: (value: T) => U): Result<U>`** - Transforms success value
-- **`flatMap<T, U>(result: Result<T>, fn: (value: T) => Result<U>): Result<U>`** - Chains operations
+- **`map<T, U, E>(result: Result<T, E>, fn: (value: T) => U): Result<U, E>`** - Transforms success value
+- **`flatMap<T, U, E>(result: Result<T, E>, fn: (value: T) => Result<U, E>): Result<U, E>`** - Chains operations
 
 ### Pattern Matching
 
-- **`match<T, U>(result: Result<T>, handlers: { ok: (value: T) => U; fail: (error: string) => U }): U`** - Exhaustive matching
+- **`match<T, U, E>(result: Result<T, E>, handlers: { ok: (value: T) => U; fail: (error: E) => U }): U`** - Exhaustive matching
 
 ### Combine
 
-- **`all<T>(results: Result<T>[]): Result<T[]>`** - Combines multiple results
+- **`all<T, E>(results: Result<T, E>[]): Result<T[], E>`** - Combines multiple results
 
 ### Try/Catch
 
-- **`tryCatch<T>(fn: () => T): Result<T>`** - Wraps throwing functions
-- **`tryCatchAsync<T>(fn: () => Promise<T>): Promise<Result<T>>`** - Wraps async functions
+- **`tryCatch<T, E>(fn: () => T): Result<T, E>`** - Wraps throwing functions (preserves error type)
+- **`tryCatchAsync<T, E>(fn: () => Promise<T>): Promise<Result<T, E>>`** - Wraps async functions (preserves error type)
 
 ## Types
 
@@ -86,12 +86,39 @@ type Success<T> = {
   value: T;
 };
 
-type Failure = {
+type Failure<E = string> = {
   success: false;
-  error: string;
+  error: E;
 };
 
-type Result<T> = Success<T> | Failure;
+type Result<T, E = string> = Success<T> | Failure<E>;
+```
+
+## Generic Error Types
+
+By default, errors are `string`. You can use custom error types for richer error handling:
+
+```typescript
+import { ok, fail, tryCatch, match } from "resultat-ts";
+
+// Custom error type
+class ValidationError {
+  constructor(public field: string, public message: string) {}
+}
+
+// Create result with custom error
+const result = fail(new ValidationError("email", "Invalid format"));
+// result type: Failure<ValidationError>
+
+// tryCatch preserves Error objects
+const parsed = tryCatch(() => JSON.parse("invalid"));
+// parsed.error instanceof Error === true
+
+// Pattern matching with custom error
+const message = match(parsed, {
+  ok: (value) => `Success: ${JSON.stringify(value)}`,
+  fail: (error) => error instanceof Error ? error.message : "Unknown error",
+});
 ```
 
 ## License
