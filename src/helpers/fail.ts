@@ -1,4 +1,4 @@
-import type { Failure } from "../types/failure.js";
+import { Fail } from "../fail.js";
 
 /**
  * Creates a {@link Failure} result.
@@ -15,6 +15,6 @@ import type { Failure } from "../types/failure.js";
  * @example
  * return fail(new Error("User not found"));
  */
-export function fail<E = string>(error: E): Failure<E> {
-  return { success: false, error };
+export function fail<E = string>(error: E): Fail<E> {
+  return new Fail(error);
 }

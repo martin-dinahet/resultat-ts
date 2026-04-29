@@ -18,3 +18,19 @@ export function unwrapOrElse<T, E = string>(result: Result<T, E>, fn: (error: E)
   if (result.success) return result.value;
   return fn(result.error);
 }
+
+/**
+ * Computes a fallback using the error (method-chaining version for failure).
+ *
+ * @template E - The error type.
+ * @template T - The fallback type.
+ * @param result - The failure result.
+ * @param fn - Function that maps the error to a fallback value.
+ * @returns The computed fallback.
+ */
+export function unwrapOrElseFailMethod<E, T>(
+  result: { success: false; error: E },
+  fn: (error: E) => T,
+): T {
+  return fn(result.error);
+}

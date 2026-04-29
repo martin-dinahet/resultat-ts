@@ -1,6 +1,4 @@
-import type { Failure } from "../types/failure.js";
 import type { Result } from "../types/result.js";
-import type { Success } from "../types/success.js";
 
 /**
  * Extracts the value from a {@link Success}.
@@ -23,4 +21,15 @@ import type { Success } from "../types/success.js";
 export function unwrap<T, E>(result: Result<T, E>): T {
   if (result.success) return result.value;
   throw result.error instanceof Error ? result.error : new Error(String(result.error));
+}
+
+/**
+ * Extracts the value from a {@link Success} (method-chaining version).
+ *
+ * @template T - The value type.
+ * @param result - The success result.
+ * @returns The contained value.
+ */
+export function unwrapMethod<T>(result: { success: true; value: T }): T {
+  return result.value;
 }

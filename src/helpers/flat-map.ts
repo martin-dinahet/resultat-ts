@@ -1,6 +1,4 @@
-import type { Failure } from "../types/failure.js";
 import type { Result } from "../types/result.js";
-import type { Success } from "../types/success.js";
 
 /**
  * Chains operations that themselves return a {@link Result}.
@@ -29,4 +27,21 @@ export function flatMap<T, U, E = string>(
 ): Result<U, E> {
   if (result.success) return fn(result.value);
   return result;
+}
+
+/**
+ * Chains operations that themselves return a {@link Result}.
+ * This is the method-chaining version that works on Ok instances.
+ *
+ * @template T - The input value type.
+ * @template U - The output value type.
+ * @template E - The error type.
+ * @param fn - Function that returns another result.
+ * @returns The next result in the chain.
+ */
+export function flatMapMethod<T, U, E>(
+  result: { success: true; value: T },
+  fn: (value: T) => Result<U, E>,
+): Result<U, E> {
+  return fn(result.value);
 }

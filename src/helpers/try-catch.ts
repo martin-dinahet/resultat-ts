@@ -1,6 +1,4 @@
-import type { Failure } from "../types/failure.js";
 import type { Result } from "../types/result.js";
-import type { Success } from "../types/success.js";
 import { fail } from "./fail.js";
 import { ok } from "./ok.js";
 

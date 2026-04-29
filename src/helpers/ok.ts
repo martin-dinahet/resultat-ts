@@ -1,4 +1,4 @@
-import type { Success } from "../types/success.js";
+import { Ok } from "../ok.js";
 
 /**
  * Creates a {@link Success} result.
@@ -12,6 +12,6 @@ import type { Success } from "../types/success.js";
  * @example
  * return ok(user);
  */
-export function ok<T>(value: T): Success<T> {
-  return { success: true, value };
+export function ok<T>(value: T): Ok<T> {
+  return new Ok(value);
 }

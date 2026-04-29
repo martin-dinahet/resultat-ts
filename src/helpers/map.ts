@@ -1,6 +1,4 @@
-import type { Failure } from "../types/failure.js";
 import type { Result } from "../types/result.js";
-import type { Success } from "../types/success.js";
 import { ok } from "./ok.js";
 
 /**
@@ -25,4 +23,20 @@ import { ok } from "./ok.js";
 export function map<T, U, E = string>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> {
   if (result.success) return ok(fn(result.value));
   return result;
+}
+
+/**
+ * Transforms the value inside a {@link Success} using the provided function.
+ * This is the method-chaining version that works on Ok instances.
+ *
+ * @template T - The input value type.
+ * @template U - The output value type.
+ * @param fn - Function applied to the success value.
+ * @returns A new {@link Result} with the transformed value.
+ */
+export function mapMethod<T, U>(
+  result: { success: true; value: T },
+  fn: (value: T) => U,
+): Result<U, never> {
+  return ok(fn(result.value));
 }

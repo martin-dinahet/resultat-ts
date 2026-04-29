@@ -20,3 +20,14 @@ import type { Result } from "../types/result.js";
 export function isFail<T, E>(result: Result<T, E>): result is Failure<E> {
   return !result.success;
 }
+
+/**
+ * Type guard that checks whether a result is Fail (method-chaining version).
+ *
+ * @template E - The error type.
+ * @param result - The failure result.
+ * @returns `true`.
+ */
+export function isFailMethod<E>(result: { success: false; error: E }): true {
+  return true;
+}

@@ -49,3 +49,38 @@ export function match<T, U, E = string>(result: Result<T, E>, handlers: MatchHan
   if (result.success) return handlers.ok(result.value);
   return handlers.fail(result.error);
 }
+
+/**
+ * Pattern-matches on a {@link Result} (method-chaining version).
+ *
+ * @template T - The type of the success value.
+ * @template U - The return type of the handlers.
+ * @template E - The error type.
+ *
+ * @param result - The result to evaluate (success case).
+ * @param handlers - An object containing handlers for both branches.
+ * @returns The value returned by the corresponding handler.
+ */
+export function matchMethod<T, U, E>(
+  result: { success: true; value: T },
+  handlers: { ok: (value: T) => U; fail: (error: never) => U },
+): U {
+  return handlers.ok(result.value);
+}
+
+/**
+ * Pattern-matches on a {@link Result} (method-chaining version for failure).
+ *
+ * @template E - The error type.
+ * @template U - The return type of the handlers.
+ *
+ * @param result - The result to evaluate (failure case).
+ * @param handlers - An object containing handlers for both branches.
+ * @returns The value returned by the corresponding handler.
+ */
+export function matchFailMethod<E, U>(
+  result: { success: false; error: E },
+  handlers: { ok: (value: never) => U; fail: (error: E) => U },
+): U {
+  return handlers.fail(result.error);
+}

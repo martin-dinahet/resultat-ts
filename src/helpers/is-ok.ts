@@ -20,3 +20,14 @@ import type { Success } from "../types/success.js";
 export function isOk<T, E>(result: Result<T, E>): result is Success<T> {
   return result.success;
 }
+
+/**
+ * Type guard that checks whether a result is Ok (method-chaining version).
+ *
+ * @template T - The value type.
+ * @param result - The success result.
+ * @returns `true`.
+ */
+export function isOkMethod<T>(result: { success: true; value: T }): true {
+  return true;
+}
