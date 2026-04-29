@@ -6,6 +6,13 @@
 - `pnpm typecheck` - Type check without emit (`tsc --noEmit`)
 - `pnpm build` - Compile to `dist/` (`tsc`)
 - `pnpm dev` - Run src/index.ts directly via tsx
+- `pnpm lint` - Lint with Biome
+- `pnpm format` - Format with Biome
+- `pnpm check` - Lint and format with Biome (auto-fix)
+
+## Git Hooks
+
+- Pre-commit hook runs `biome check --write` on staged files via husky + lint-staged
 
 ## Stack
 

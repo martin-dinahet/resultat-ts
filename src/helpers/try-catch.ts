@@ -26,6 +26,6 @@ export function tryCatch<T, E = string>(fn: () => T): Result<T, E> {
   try {
     return ok(fn());
   } catch (e) {
-    return fail(e instanceof Error ? (e as E) : String(e) as unknown as E);
+    return fail(e instanceof Error ? (e as E) : (String(e) as unknown as E));
   }
 }

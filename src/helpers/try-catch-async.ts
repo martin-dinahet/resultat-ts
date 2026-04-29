@@ -27,6 +27,6 @@ export async function tryCatchAsync<T, E = string>(fn: () => Promise<T>): Promis
     const value = await fn();
     return ok(value);
   } catch (e) {
-    return fail(e instanceof Error ? (e as E) : String(e) as unknown as E);
+    return fail(e instanceof Error ? (e as E) : (String(e) as unknown as E));
   }
 }

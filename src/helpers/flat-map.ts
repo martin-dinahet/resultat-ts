@@ -23,7 +23,10 @@ import type { Success } from "../types/success.js";
  *
  * const result = flatMap(ok("42"), parse); // ok(42)
  */
-export function flatMap<T, U, E = string>(result: Result<T, E>, fn: (value: T) => Result<U, E>): Result<U, E> {
+export function flatMap<T, U, E = string>(
+  result: Result<T, E>,
+  fn: (value: T) => Result<U, E>,
+): Result<U, E> {
   if (result.success) return fn(result.value);
   return result;
 }

@@ -46,7 +46,7 @@
     "vitest": "^3.2.4"
   },
   "lint-staged": {
-    "*.{ts,tsx,js,jsx}": "biome check --write",
-    "*.{json,md}": "biome check --write"
+    "*.{ts,tsx,js,jsx}": "pnpm exec biome check --write",
+    "*.{json,md}": "pnpm exec biome check --write"
   }
 }

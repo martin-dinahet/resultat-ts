@@ -58,9 +58,7 @@ describe("unwrapOrElse", () => {
     expect(Resultat.unwrapOrElse(Resultat.ok(10), (e) => e.length)).toBe(10);
   });
   it("returns computed fallback for failure", () => {
-    expect(Resultat.unwrapOrElse(Resultat.fail("404"), (e) => e.length)).toBe(
-      3,
-    );
+    expect(Resultat.unwrapOrElse(Resultat.fail("404"), (e) => e.length)).toBe(3);
   });
 });
 
@@ -78,9 +76,7 @@ describe("map", () => {
 
 describe("flatMap", () => {
   it("chains success results", () => {
-    const parse = (
-      s: string,
-    ): ReturnType<typeof Resultat.ok<number>> | Resultat.Failure =>
+    const parse = (s: string): ReturnType<typeof Resultat.ok<number>> | Resultat.Failure =>
       Number.isNaN(Number(s)) ? Resultat.fail("NaN") : Resultat.ok(Number(s));
     const result = Resultat.flatMap(Resultat.ok("42"), parse);
     expect(result.success).toBe(true);
@@ -156,8 +152,7 @@ describe("tryCatchAsync", () => {
     expect(result.success).toBe(false);
     if (!result.success) {
       expect(result.error).toBeInstanceOf(Error);
-      if (result.error instanceof Error)
-        expect(result.error.message).toBe("async error");
+      if (result.error instanceof Error) expect(result.error.message).toBe("async error");
     }
   });
 });

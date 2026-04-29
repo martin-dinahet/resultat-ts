@@ -1,4 +1,3 @@
-import type { Failure } from "../types/failure.js";
 import type { Result } from "../types/result.js";
 
 type MatchHandlers<T, U, E = string> = {
