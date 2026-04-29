@@ -12,6 +12,7 @@ import { ok } from "./ok.js";
  * This is useful for aggregating multiple independent operations.
  *
  * @template T - The value type.
+ * @template E - The error type.
  * @param results - Array of results.
  * @returns A combined result.
  *
@@ -21,7 +22,7 @@ import { ok } from "./ok.js";
  * @example
  * all([ok(1), fail("err"), ok(3)]); // fail("err")
  */
-export function all<T>(results: Result<T>[]): Result<T[]> {
+export function all<T, E = string>(results: Result<T, E>[]): Result<T[], E> {
   const values: T[] = [];
   for (const result of results) {
     if (!result.success) return result;

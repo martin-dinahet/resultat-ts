@@ -12,6 +12,7 @@ import type { Success } from "../types/success.js";
  *
  * @template T - The input value type.
  * @template U - The output value type.
+ * @template E - The error type.
  * @param result - The result to chain.
  * @param fn - Function that returns another result.
  * @returns The next result in the chain, or the original failure.
@@ -22,7 +23,7 @@ import type { Success } from "../types/success.js";
  *
  * const result = flatMap(ok("42"), parse); // ok(42)
  */
-export function flatMap<T, U>(result: Result<T>, fn: (value: T) => Result<U>): Result<U> {
+export function flatMap<T, U, E = string>(result: Result<T, E>, fn: (value: T) => Result<U, E>): Result<U, E> {
   if (result.success) return fn(result.value);
   return result;
 }

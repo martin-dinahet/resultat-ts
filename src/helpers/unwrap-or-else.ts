@@ -6,6 +6,7 @@ import type { Result } from "../types/result.js";
  * Similar to {@link unwrapOr}, but allows deriving the fallback dynamically.
  *
  * @template T - The value type.
+ * @template E - The error type.
  * @param result - The result to unwrap.
  * @param fn - Function that maps the error to a fallback value.
  * @returns The success value or the computed fallback.
@@ -13,7 +14,7 @@ import type { Result } from "../types/result.js";
  * @example
  * unwrapOrElse(fail("404"), err => err.length); // 3
  */
-export function unwrapOrElse<T>(result: Result<T>, fn: (error: string) => T): T {
+export function unwrapOrElse<T, E = string>(result: Result<T, E>, fn: (error: E) => T): T {
   if (result.success) return result.value;
   return fn(result.error);
 }

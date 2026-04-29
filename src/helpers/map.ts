@@ -11,6 +11,7 @@ import { ok } from "./ok.js";
  *
  * @template T - The input value type.
  * @template U - The output value type.
+ * @template E - The error type.
  * @param result - The result to transform.
  * @param fn - Function applied to the success value.
  * @returns A new {@link Result} with the transformed value, or the original failure.
@@ -21,7 +22,7 @@ import { ok } from "./ok.js";
  * @example
  * const result = map(fail("err"), x => x * 2); // fail("err")
  */
-export function map<T, U>(result: Result<T>, fn: (value: T) => U): Result<U> {
+export function map<T, U, E = string>(result: Result<T, E>, fn: (value: T) => U): Result<U, E> {
   if (result.success) return ok(fn(result.value));
   return result;
 }

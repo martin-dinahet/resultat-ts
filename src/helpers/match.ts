@@ -1,8 +1,9 @@
+import type { Failure } from "../types/failure.js";
 import type { Result } from "../types/result.js";
 
-type MatchHandlers<T, U> = {
+type MatchHandlers<T, U, E = string> = {
   ok: (value: T) => U;
-  fail: (error: string) => U;
+  fail: (error: E) => U;
 };
 
 /**
@@ -14,6 +15,7 @@ type MatchHandlers<T, U> = {
  *
  * @template T - The type of the success value.
  * @template U - The return type of the handlers.
+ * @template E - The error type.
  *
  * @param result - The result to evaluate.
  * @param handlers - An object containing handlers for both success (`ok`)
@@ -44,7 +46,7 @@ type MatchHandlers<T, U> = {
  * - Prefer this over `unwrap` when you want safe, explicit control flow.
  * - Works well as the "exit point" of a `Result` pipeline.
  */
-export function match<T, U>(result: Result<T>, handlers: MatchHandlers<T, U>): U {
+export function match<T, U, E = string>(result: Result<T, E>, handlers: MatchHandlers<T, U, E>): U {
   if (result.success) return handlers.ok(result.value);
   return handlers.fail(result.error);
 }
