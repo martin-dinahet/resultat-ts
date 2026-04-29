@@ -9,6 +9,7 @@ export { isFail } from "./helpers/is-fail";
 export { isOk } from "./helpers/is-ok";
 // Transform
 export { map } from "./helpers/map";
+export { mapError } from "./helpers/map-error";
 // Pattern matching
 export { match } from "./helpers/match";
 // Constructors

@@ -63,6 +63,7 @@ const fallback = unwrapOr(fail("err"), 0); // 0
 ### Transform
 
 - **`map<T, U, E>(result: Result<T, E>, fn: (value: T) => U): Result<U, E>`** - Transforms success value
+- **`mapError<T, E, E2>(result: Result<T, E>, fn: (error: E) => E2): Result<T, E2>`** - Transforms error value
 - **`flatMap<T, U, E>(result: Result<T, E>, fn: (value: T) => Result<U, E>): Result<U, E>`** - Chains operations
 
 ### Pattern Matching
@@ -99,7 +100,7 @@ type Result<T, E = string> = Success<T> | Failure<E>;
 By default, errors are `string`. You can use custom error types for richer error handling:
 
 ```typescript
-import { ok, fail, tryCatch, match } from "resultat-ts";
+import { ok, fail, tryCatch, match, mapError } from "resultat-ts";
 
 // Custom error type
 class ValidationError {
@@ -114,10 +115,15 @@ const result = fail(new ValidationError("email", "Invalid format"));
 const parsed = tryCatch(() => JSON.parse("invalid"));
 // parsed.error instanceof Error === true
 
+// Transform errors with mapError
+const transformed = mapError(parsed, (err) =>
+  err instanceof Error ? { code: "PARSE_ERROR", message: err.message } : { code: "UNKNOWN", message: "Unknown" }
+);
+
 // Pattern matching with custom error
-const message = match(parsed, {
+const message = match(transformed, {
   ok: (value) => `Success: ${JSON.stringify(value)}`,
-  fail: (error) => error instanceof Error ? error.message : "Unknown error",
+  fail: (error) => `Error ${error.code}: ${error.message}`,
 });
 ```
 

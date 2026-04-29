@@ -27,6 +27,7 @@
 - Single package, flat structure: `src/helpers/`, `src/types/`
 - Entrypoint: `src/index.ts` re-exports everything
 - Types: `Result<T, E = string>`, `Success<T>`, `Failure<E = string>` defined in `src/types/` (error type `E` defaults to `string` for backward compatibility)
+- Key helpers: `ok`, `fail`, `map`, `mapError`, `flatMap`, `match`, `unwrap`, `unwrapOr`, `unwrapOrElse`, `all`, `tryCatch`, `tryCatchAsync`
 - `dist/` is build output; `dist/__tests__` and `dist/**/*.test.*` excluded from npm via `.npmignore`
 
 ## CI

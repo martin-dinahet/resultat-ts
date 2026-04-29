@@ -74,6 +74,28 @@ describe("map", () => {
   });
 });
 
+describe("mapError", () => {
+  it("transforms error value", () => {
+    const result = Resultat.mapError(Resultat.fail("not found"), (err) => err.toUpperCase());
+    expect(result.success).toBe(false);
+    if (!result.success) expect(result.error).toBe("NOT FOUND");
+  });
+  it("passes through success unchanged", () => {
+    const result = Resultat.mapError(Resultat.ok(42), (_err: string) => "error");
+    expect(result.success).toBe(true);
+    if (result.success) expect(result.value).toBe(42);
+  });
+  it("can change error type", () => {
+    const result = Resultat.fail("404") as Resultat.Result<number, string>;
+    const mapped = Resultat.mapError(result, (err) => ({ code: err, message: "Error" }));
+    expect(mapped.success).toBe(false);
+    if (!mapped.success) {
+      expect(mapped.error.code).toBe("404");
+      expect(mapped.error.message).toBe("Error");
+    }
+  });
+});
+
 describe("flatMap", () => {
   it("chains success results", () => {
     const parse = (s: string): ReturnType<typeof Resultat.ok<number>> | Resultat.Failure =>
