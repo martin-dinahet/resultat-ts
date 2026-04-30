@@ -434,3 +434,41 @@ export class Err<E> extends Result<never, E> {
     return null;
   }
 }
+
+/**
+ * Creates a successful {@link Result} wrapping the given value.
+ *
+ * Shorthand for {@link Result.ok}.
+ *
+ * @typeParam T - The type of the success value.
+ * @param value - The success value to wrap.
+ * @returns An {@link Ok} instance containing `value`.
+ *
+ * @example
+ * ```ts
+ * const result = ok(42);
+ * result.unwrap(); // 42
+ * ```
+ */
+export function ok<T>(value: T): Ok<T> {
+  return Result.ok(value);
+}
+
+/**
+ * Creates a failed {@link Result} wrapping the given error.
+ *
+ * Shorthand for {@link Result.err}.
+ *
+ * @typeParam E - The type of the error value.
+ * @param error - The error value to wrap.
+ * @returns An {@link Err} instance containing `error`.
+ *
+ * @example
+ * ```ts
+ * const result = err("something went wrong");
+ * result.isErr(); // true
+ * ```
+ */
+export function err<E>(error: E): Err<E> {
+  return Result.err(error);
+}
