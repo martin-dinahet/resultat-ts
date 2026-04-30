@@ -67,7 +67,7 @@ if (success.isOk()) {
   console.log(success.value); // 42
 }
 
-// Pattern matching — both branches must return the same type
+// Pattern matching — branches can return different types
 const message = failure.match({
   ok: (value) => `Success: ${value}`,
   err: (error) => `Error: ${error}`,
@@ -108,7 +108,7 @@ yarn add @punpun-dev/ts-result
 | `unwrap(): T` | Returns value or throws if `Err` |
 | `unwrapOr(fallback: T): T` | Returns value or `fallback` if `Err` |
 | `unwrapOrElse(fn: (error: E) => T): T` | Returns value or computes fallback from error |
-| `match<U>(cases): U` | Exhaustive match with `ok` and `err` branches |
+| `match<U, V>(cases): U \| V` | Exhaustive match with `ok` and `err` branches (can return different types) |
 | `map<U>(fn: (value: T) => U): Result<U, E>` | Transform the success value |
 | `mapErr<F>(fn: (error: E) => F): Result<T, F>` | Transform the error value |
 | `flatMap<U>(fn: (value: T) => Result<U, E>): Result<U, E>` | Chain result-returning functions (no nesting) |
@@ -126,18 +126,22 @@ yarn add @punpun-dev/ts-result
 
 ### Helper Functions
 
-Shorthand alternatives to `Result.ok()` and `Result.err()` — useful when you prefer not to reference the `Result` class directly.
+Shorthand alternatives to `Result.ok()`, `Result.err()`, and `Result.handle()` — useful when you prefer not to reference the `Result` class directly.
 
 | Function | Description |
 |----------|-------------|
 | `ok<T>(value: T): Ok<T>` | Same as `Result.ok(value)` |
 | `err<E>(error: E): Err<E>` | Same as `Result.err(error)` |
+| `handle<T>(fn: () => T \| Promise<T>): Promise<Result<T, unknown>>` | Same as `Result.handle(fn)` |
 
 ```typescript
-import { ok, err } from "@punpun-dev/ts-result";
+import { ok, err, handle } from "@punpun-dev/ts-result";
 
 const success = ok(42);
 const failure = err("oops");
+
+// Wrap throwing code
+const result = await handle(() => fetchUser(userId));
 ```
 
 ### `Ok<T>` and `Err<E>`

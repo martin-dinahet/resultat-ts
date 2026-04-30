@@ -173,11 +173,12 @@ export abstract class Result<T, E> {
    * Pattern matches on this result, executing the corresponding branch.
    *
    * This is the most expressive way to handle both cases exhaustively.
-   * Both branches must return the same type `U`.
+   * The `ok` and `err` branches can return different types `U` and `V`.
    *
-   * @typeParam U - The return type of both branches.
+   * @typeParam U - The return type of the `ok` branch.
+   * @typeParam V - The return type of the `err` branch.
    * @param cases - An object with an `ok` branch and an `err` branch.
-   * @returns The return value of whichever branch was executed.
+   * @returns The return value of whichever branch was executed (`U | V`).
    *
    * @example
    * ```ts
@@ -187,7 +188,7 @@ export abstract class Result<T, E> {
    * });
    * ```
    */
-  public abstract match<U>(cases: { ok: (value: T) => U; err: (error: E) => U }): U;
+  public abstract match<U, V>(cases: { ok: (value: T) => U; err: (error: E) => V }): U | V;
 
   /**
    * Transforms the success value using `fn`, leaving errors untouched.
@@ -340,7 +341,7 @@ export class Ok<T> extends Result<T, never> {
     return this.value;
   }
 
-  public match<U>(cases: { ok: (value: T) => U; err: (error: never) => U }): U {
+  public match<U, V>(cases: { ok: (value: T) => U; err: (error: never) => V }): U {
     return cases.ok(this.value);
   }
 
@@ -405,7 +406,7 @@ export class Err<E> extends Result<never, E> {
     return fallbackFn(this.error);
   }
 
-  public match<U>(cases: { ok: (value: never) => U; err: (error: E) => U }): U {
+  public match<U, V>(cases: { ok: (value: never) => U; err: (error: E) => V }): V {
     return cases.err(this.error);
   }
 
@@ -471,4 +472,23 @@ export function ok<T>(value: T): Ok<T> {
  */
 export function err<E>(error: E): Err<E> {
   return Result.err(error);
+}
+
+/**
+ * Executes a function (sync or async) and wraps the outcome in a `Result`.
+ * If the function throws or rejects, the error is caught and returned as an {@link Err}.
+ *
+ * Shorthand for {@link Result.handle}.
+ *
+ * @typeParam T - The return type of `fn`.
+ * @param fn - A function (or async function) that may throw.
+ * @returns A `Promise` resolving to `Ok<T>` on success or `Err<unknown>` on failure.
+ *
+ * @example
+ * ```ts
+ * const result = await handle(() => fetchUser(userId));
+ * ```
+ */
+export async function handle<T>(fn: () => T | Promise<T>): Promise<Result<T, unknown>> {
+  return Result.handle(fn);
 }
