@@ -1,6 +1,6 @@
 {
   "name": "@punpun-dev/ts-result",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "A tiny TypeScript Result type for explicit error handling without exceptions",
   "type": "module",
   "main": "./dist/index.js",
