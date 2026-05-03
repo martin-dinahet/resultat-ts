@@ -56,11 +56,11 @@ This library is inspired by Rust's `Result<T, E>` type, which makes error handli
 ## Usage
 
 ```typescript
-import { Result, ok, err } from "@punpun-dev/ts-result";
+import { Result } from "@punpun-dev/ts-result";
 
-// Create results — use ok()/err() helpers or Result.ok()/Result.err()
-const success = ok(42);
-const failure = err("Something went wrong");
+// Create results
+const success = Result.ok(42);
+const failure = Result.err("Something went wrong");
 
 // Check result type with type-narrowing methods
 if (success.isOk()) {
@@ -74,13 +74,17 @@ const message = failure.match({
 });
 
 // Chain operations fluently
-const doubled = ok(21)
+const doubled = Result.ok(21)
   .map((x) => x * 2)              // Ok(42)
-  .flatMap((x) => ok(x + 1))      // Ok(43)
+  .flatMap((x) => Result.ok(x + 1)) // Ok(43)
   .unwrapOr(0);                    // 43
 
-// Wrap throwing code (sync or async)
-const result = await Result.handle(async () => {
+// Wrap throwing code
+// Sync: Result.try
+const syncResult = Result.try(() => JSON.parse("{\"a\":1}"));
+
+// Async: Result.tryAsync
+const asyncResult = await Result.tryAsync(async () => {
   const res = await fetch("/api/user");
   if (!res.ok) throw new Error("Request failed");
   return res.json();
@@ -101,10 +105,14 @@ yarn add @punpun-dev/ts-result
 
 ### `Result<T, E>` (abstract base class)
 
+#### Instance Methods
+
 | Method | Description |
 |--------|-------------|
 | `isOk(): this is Ok<T>` | Narrow to `Ok` (type guard) |
 | `isErr(): this is Err<E>` | Narrow to `Err` (type guard) |
+| `isOkAnd(predicate: (value: T) => boolean): boolean` | Check if `Ok` and predicate passes |
+| `isErrAnd(predicate: (error: E) => boolean): boolean` | Check if `Err` and predicate passes |
 | `unwrap(): T` | Returns value or throws if `Err` |
 | `unwrapOr(fallback: T): T` | Returns value or `fallback` if `Err` |
 | `unwrapOrElse(fn: (error: E) => T): T` | Returns value or computes fallback from error |
@@ -112,37 +120,27 @@ yarn add @punpun-dev/ts-result
 | `map<U>(fn: (value: T) => U): Result<U, E>` | Transform the success value |
 | `mapErr<F>(fn: (error: E) => F): Result<T, F>` | Transform the error value |
 | `flatMap<U>(fn: (value: T) => Result<U, E>): Result<U, E>` | Chain result-returning functions (no nesting) |
+| `andThen<U>(fn: (value: T) => Result<U, E>): Result<U, E>` | Alias for `flatMap` (Rust-style) |
+| `orElse<U>(fn: (error: E) => Result<U, E>): Result<U, E>` | Recover from error with a new Result |
 | `tap(fn: (value: T) => void): this` | Side-effect on `Ok`, returns same instance |
 | `tapErr(fn: (error: E) => void): this` | Side-effect on `Err`, returns same instance |
 | `toNullable(): T \| null` | Returns value or `null` |
+| `flip(): Result<E, T>` | Swap `Ok` and `Err` |
+| `toPromise(): Promise<T>` | Convert to Promise (Ok → resolve, Err → reject) |
+| `toString(): string` | Human-readable string representation |
+| `toJSON(): { ok: T } \| { err: E }` | JSON-serializable representation |
 
-### Static Members
+#### Static Methods
 
 | Method | Description |
 |--------|-------------|
 | `Result.ok<T>(value: T): Ok<T>` | Creates a successful result |
 | `Result.err<E>(error: E): Err<E>` | Creates a failed result |
-| `Result.handle<T>(fn: () => T \| Promise<T>): Promise<Result<T, unknown>>` | Wraps sync/async throwing code |
-
-### Helper Functions
-
-Shorthand alternatives to `Result.ok()`, `Result.err()`, and `Result.handle()` — useful when you prefer not to reference the `Result` class directly.
-
-| Function | Description |
-|----------|-------------|
-| `ok<T>(value: T): Ok<T>` | Same as `Result.ok(value)` |
-| `err<E>(error: E): Err<E>` | Same as `Result.err(error)` |
-| `handle<T>(fn: () => T \| Promise<T>): Promise<Result<T, unknown>>` | Same as `Result.handle(fn)` |
-
-```typescript
-import { ok, err, handle } from "@punpun-dev/ts-result";
-
-const success = ok(42);
-const failure = err("oops");
-
-// Wrap throwing code
-const result = await handle(() => fetchUser(userId));
-```
+| `Result.try<T>(fn: () => T): Result<T, unknown>` | Wraps sync throwing code |
+| `Result.tryAsync<T>(fn: () => T \| Promise<T>): Promise<Result<T, unknown>>` | Wraps sync/async throwing code |
+| `Result.all<T>(results: Result[]): Result<T[], E>` | Combines multiple Results (fail-fast) |
+| `Result.fromNullable<T, E>(value: T \| null \| undefined, error: E): Result<T, E>` | Convert nullable to Result |
+| `Result.fromPredicate<T, E>(value: T, predicate: (value: T) => boolean, error: E): Result<T, E>` | Create Result from predicate check |
 
 ### `Ok<T>` and `Err<E>`
 
@@ -150,6 +148,159 @@ These are the concrete subclasses of `Result`. You typically don't construct the
 
 - `Ok<T>` exposes a `value: T` property (access after narrowing with `isOk()`)
 - `Err<E>` exposes an `error: E` property (access after narrowing with `isErr()`)
+
+## Examples
+
+### Basic Usage
+
+```typescript
+import { Result } from "@punpun-dev/ts-result";
+
+// Creating results
+const success = Result.ok(42);
+const failure = Result.err("Something went wrong");
+
+// Type narrowing
+if (success.isOk()) {
+  console.log(success.value); // 42
+}
+
+// Pattern matching
+const message = failure.match({
+  ok: (value) => `Success: ${value}`,
+  err: (error) => `Error: ${error}`,
+});
+```
+
+### Wrapping Throwing Code
+
+```typescript
+import { Result } from "@punpun-dev/ts-result";
+
+// Sync code
+const parseResult = Result.try(() => JSON.parse("{\"a\":1}"));
+// Result<unknown, unknown>
+
+// Async code
+const fetchResult = await Result.tryAsync(async () => {
+  const res = await fetch("/api/user");
+  if (!res.ok) throw new Error("Request failed");
+  return res.json();
+});
+// Promise<Result<User, unknown>>
+```
+
+### Combining Results
+
+```typescript
+import { Result } from "@punpun-dev/ts-result";
+
+const a = Result.ok(1);
+const b = Result.ok(2);
+const c = Result.ok(3);
+
+const combined = Result.all([a, b, c]);
+// Result<[1, 2, 3], never>
+
+// With an error (fail-fast)
+const d = Result.err("oops");
+const withError = Result.all([a, d, c]);
+// Result<never, string> — returns first error
+```
+
+### Error Recovery
+
+```typescript
+import { Result } from "@punpun-dev/ts-result";
+
+const cached = getCachedUser(id); // Result<User, string>
+
+// Recover from error without breaking chain
+const user = cached.orElse(() => fetchUserFromDb(id));
+// Still Result<User, string>
+```
+
+### Nullable Interop
+
+```typescript
+import { Result } from "@punpun-dev/ts-result";
+
+const user = Result.fromNullable(
+  localStorage.getItem("user"),
+  "No user found"
+);
+// Result<string, string>
+
+if (user.isOk()) {
+  console.log(user.value);
+} else {
+  console.log(user.error); // "No user found"
+}
+```
+
+### Validation with Predicate
+
+```typescript
+import { Result } from "@punpun-dev/ts-result";
+
+function validateAge(age: number): Result<number, string> {
+  return Result.fromPredicate(
+    age,
+    (a) => a >= 0 && a <= 150,
+    "Invalid age"
+  );
+}
+
+validateAge(25); // Ok(25)
+validateAge(-5); // Err("Invalid age")
+```
+
+### Flip Result
+
+```typescript
+import { Result } from "@punpun-dev/ts-result";
+
+const exists = checkFileExists(path);
+
+if (exists.isOk()) {
+  // File exists, proceed
+}
+
+const notExists = exists.flip();
+// Now Ok means file doesn't exist
+```
+
+### Promise Interop
+
+```typescript
+import { Result } from "@punpun-dev/ts-result";
+
+const result = Result.ok(42);
+
+// Convert to Promise
+try {
+  const value = await result.toPromise();
+  console.log(value); // 42
+} catch (e) {
+  // Won't happen for Ok
+}
+
+const errResult = Result.err("oops");
+await errResult.toPromise(); // Throws "oops"
+```
+
+### Debugging
+
+```typescript
+import { Result } from "@punpun-dev/ts-result";
+
+console.log(Result.ok(42).toString()); // "Ok(42)"
+console.log(Result.err("oops").toString()); // "Err(oops)"
+
+// JSON serialization
+JSON.stringify(Result.ok({ a: 1 }).toJSON()); // '{"ok":{"a":1}}'
+JSON.stringify(Result.err("fail").toJSON()); // '{"err":"fail"}'
+```
 
 ## Fullstack Examples
 
@@ -177,7 +328,7 @@ import express from "express";
 const router = express.Router();
 
 function findUserById(id: string): Result<User | null, Error> {
-  return Result.handle(() => db.users.findById(id));
+  return Result.try(() => db.users.findById(id));
 }
 
 function updateUserEmail(user: User, email: string): Result<User, AppError> {
@@ -188,7 +339,7 @@ function updateUserEmail(user: User, email: string): Result<User, AppError> {
 }
 
 router.patch("/users/:id/email", async (req, res) => {
-  const result = await Result.handle(async () => {
+  const result = await Result.tryAsync(async () => {
     const { id } = req.params;
     const { email } = req.body;
 
@@ -238,7 +389,7 @@ export async function createOrder(
   }
 
   // Run async database transaction
-  const result = await Result.handle(async () => {
+  const result = await Result.tryAsync(async () => {
     return db.transaction(async (tx) => {
       const order = await tx.orders.create({ userId, status: "pending" });
       await tx.orderItems.createMany(
@@ -266,7 +417,7 @@ import type { ApiResponse } from "shared/types";
 type FetchError = { status: number; message: string };
 
 async function apiFetch<T>(url: string, options?: RequestInit): Promise<ApiResponse<T>> {
-  const result = await Result.handle(async () => {
+  const result = await Result.tryAsync(async () => {
     const res = await fetch(url, {
       ...options,
       headers: { "Content-Type": "application/json", ...options?.headers },
@@ -355,8 +506,8 @@ class ValidationError {
 const result = Result.err(new ValidationError("email", "Invalid format"));
 // result type: Result<never, ValidationError>
 
-// Result.handle preserves thrown error types
-const parsed = await Result.handle(() => JSON.parse("invalid"));
+// Result.try preserves thrown error types
+const parsed = Result.try(() => JSON.parse("invalid"));
 // parsed.error is `unknown` — narrow as needed
 
 // Transform errors with mapErr
